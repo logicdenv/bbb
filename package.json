@@ -1,0 +1,21 @@
+{
+  "name": "voidlure",
+  "version": "1.0.0",
+  "description": "VoidLure URL Shortener",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.6",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "axios": "^1.5.0"
+  },
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  }
+}
