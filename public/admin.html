@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VoidLure — Admin Panel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0a;color:#e8e6e3;line-height:1.6}
+:root{--border:rgba(255,255,255,0.08);--card-bg:rgba(255,255,255,0.03);--muted:#888}
+.gradient-text{background:linear-gradient(135deg,#ffffff,#666666);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.container{max-width:1200px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--border);background:rgba(10,10,10,0.85);backdrop-filter:blur(12px);padding:16px 0}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:900;text-decoration:none;color:#fff}
+.logo-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);font-size:18px;color:#fff}
+.btn-primary{padding:10px 24px;border-radius:12px;background:#fff;color:#000;font-weight:700;font-size:14px;border:none;cursor:pointer;transition:transform .15s}
+.btn-primary:hover{transform:scale(.98)}
+.btn-danger{padding:8px 16px;border-radius:8px;background:#ff4444;color:#fff;font-weight:600;font-size:13px;border:none;cursor:pointer;transition:transform .15s}
+.btn-danger:hover{transform:scale(.95)}
+.btn-success{padding:8px 16px;border-radius:8px;background:#00c853;color:#fff;font-weight:600;font-size:13px;border:none;cursor:pointer;transition:transform .15s}
+.btn-success:hover{transform:scale(.95)}
+.section{padding:40px 0}
+.admin-card{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px}
+.admin-card h2{font-size:20px;font-weight:700;margin-bottom:16px;color:#fff}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+td{font-size:14px}
+.tier-badge{display:inline-block;padding:2px 12px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase}
+.tier-free{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid rgba(255,255,255,0.05)}
+.tier-vip{background:rgba(255,215,0,0.15);color:#ffd700;border:1px solid rgba(255,215,0,0.2)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.stat-box{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center}
+.stat-box .number{font-size:32px;font-weight:900;background:linear-gradient(135deg,#fff,#888);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-box .label{font-size:12px;color:var(--muted);margin-top:4px}
+.toast{position:fixed;bottom:30px;right:30px;padding:14px 24px;border-radius:12px;background:#1a1a1a;border:1px solid var(--border);color:#e8e6e3;font-size:14px;box-shadow:0 8px 32px rgba(0,0,0,0.5);transform:translateY(120px);opacity:0;transition:all .4s ease;z-index:999;max-width:400px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.05)}
+.toast.error{border-color:#ff6b6b;background:rgba(255,107,107,0.05)}
+.login-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);display:flex;justify-content:center;align-items:center;z-index:1000}
+.login-box{background:#1a1a1a;border:1px solid var(--border);border-radius:24px;padding:40px;max-width:400px;width:90%}
+.login-box h2{font-size:24px;font-weight:700;margin-bottom:8px}
+.login-box p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.login-box input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card-bg);color:#e8e6e3;font-size:14px;outline:none;margin-bottom:16px;transition:border-color .2s}
+.login-box input:focus{border-color:#fff}
+.login-box .btn-primary{width:100%;justify-content:center}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.1);border-top:2px solid #fff;border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<div id="adminLogin" class="login-overlay">
+<div class="login-box">
+<h2>Admin Access</h2>
+<p>Enter your admin credentials</p>
+<input type="email" id="adminEmail" placeholder="admin@voidlure.com" />
+<input type="password" id="adminPassword" placeholder="Enter your password" />
+<button class="btn-primary" onclick="verifyAdmin()">Access Panel</button>
+<div style="margin-top:12px;text-align:center;font-size:13px;color:var(--muted);">
+<a href="/" style="color:#fff;text-decoration:underline;">Back to site</a>
+</div>
+</div>
+</div>
+<div id="adminPanel" style="display:none;">
+<header>
+<div class="container header-inner">
+<div class="logo"><span class="logo-icon">V</span><span>VoidLure Admin</span></div>
+<div><button class="btn-primary" onclick="logoutAdmin()" style="padding:8px 20px;font-size:13px;">Logout</button></div>
+</div>
+</header>
+<section class="section">
+<div class="container">
+<h1 style="font-size:28px;font-weight:900;margin-bottom:24px;" class="gradient-text">Admin Dashboard</h1>
+<div class="stats-grid" id="statsGrid">
+<div class="stat-box"><div class="number" id="totalUsers">0</div><div class="label">Total Users</div></div>
+<div class="stat-box"><div class="number" id="vipUsers">0</div><div class="label">VIP Users</div></div>
+<div class="stat-box"><div class="number" id="freeUsers">0</div><div class="label">Free Users</div></div>
+<div class="stat-box"><div class="number" id="totalLinks">0</div><div class="label">Links Generated</div></div>
+</div>
+<div class="admin-card">
+<h2>User Management</h2>
+<div style="overflow-x:auto;">
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Tier</th><th>Joined</th><th>Actions</th></tr></thead>
+<tbody id="userTableBody"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">Loading...</td></tr></tbody>
+</table>
+</div>
+</div>
+<div class="admin-card">
+<h2>Quick Actions</h2>
+<div style="display:flex;gap:12px;flex-wrap:wrap;">
+<button class="btn-success" onclick="refreshData()">Refresh Data</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+var _0x1a2b=['adminLogin','adminPanel','adminEmail','adminPassword','getItem','setItem','parse','stringify','then','catch','json','log','error','users','map','join','innerHTML','textContent','forEach','push','filter','find','length','tier','isAdmin','created_at','name','email','id','substring','includes','toUpperCase','charAt','slice','replace','split','indexOf','lastIndexOf'];
+var API_URL='';
+function getToken(){return localStorage[_0x1a2b[4]]('voidlure_token');}
+function getHeaders(){var t=getToken();return{'Content-Type':'application/json','Authorization':t?'Bearer '+t:''};}
+function showToast(msg,type){var toast=document[_0x1a2b[0]]('toast');toast[_0x1a2b[16]]=msg;toast.className='toast '+(type||'success');void toast.offsetWidth;toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(function(){toast.classList.remove('show');},3000);}
+async function verifyAdmin(){var email=document[_0x1a2b[0]]('adminEmail').value.trim();var password=document[_0x1a2b[0]]('adminPassword').value.trim();if(!email||!password){showToast('Please enter email and password.','error');return;}
+try{var res=await fetch(API_URL+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON[_0x1a2b[7]]({email:email,password:password})});var data=await res[_0x1a2b[10]]();if(!res.ok){showToast(data[_0x1a2b[3]]||'Invalid credentials','error');return;}
+if(!data.user||!data.user.isAdmin){showToast('Admin access required.','error');return;}
+localStorage[_0x1a2b[5]]('voidlure_token',data.token);localStorage[_0x1a2b[5]]('voidlure_user',JSON[_0x1a2b[7]](data.user));document[_0x1a2b[0]]('adminLogin').style.display='none';document[_0x1a2b[1]]('adminPanel').style.display='block';loadUsers();loadStats();showToast('Welcome Admin!','success');}catch(err){showToast('Connection error.','error');console[_0x1a2b[12]](err);}}
+function logoutAdmin(){localStorage.removeItem('voidlure_token');localStorage.removeItem('voidlure_user');document[_0x1a2b[0]]('adminLogin').style.display='flex';document[_0x1a2b[1]]('adminPanel').style.display='none';document[_0x1a2b[0]]('adminPassword').value='';showToast('Logged out.','info');}
+async function loadUsers(){try{var res=await fetch(API_URL+'/api/admin/users',{headers:getHeaders()});if(!res.ok){if(res.status===401||res.status===403){logoutAdmin();return;}
+throw new Error('Failed to load users');}
+var data=await res[_0x1a2b[10]]();var users=data.users||[];var tbody=document[_0x1a2b[0]]('userTableBody');if(users[_0x1a2b[21]]===0){tbody[_0x1a2b[16]]='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">No users found.</td></tr>';return;}
+tbody[_0x1a2b[16]]=users[_0x1a2b[14]](function(u){var tier=u[_0x1a2b[22]]||'free';var tierClass=tier==='vip'?'tier-vip':'tier-free';var tierLabel=tier==='vip'?'VIP':'Free';var joined=u[_0x1a2b[24]]?u[_0x1a2b[24]][_0x1a2b[28]](0,10):'N/A';var isAdmin=u[_0x1a2b[23]]?' 👑':'';return'<tr><td>'+u[_0x1a2b[27]]+'</td><td>'+(u[_0x1a2b[25]]||u[_0x1a2b[26]][_0x1a2b[28]](0,10))+isAdmin+'</td><td>'+u[_0x1a2b[26]]+'</td><td><span class="tier-badge '+tierClass+'">'+tierLabel+'</span></td><td>'+joined+'</td><td>'+(u[_0x1a2b[23]]?'<span style="color:var(--muted);font-size:12px;">Admin</span>':(tier==='vip'?'<button class="btn-danger" onclick="setTier('+u[_0x1a2b[27]]+',\'free\')">Downgrade</button>':'<button class="btn-success" onclick="setTier('+u[_0x1a2b[27]]+',\'vip\')">Upgrade</button>'))+(u[_0x1a2b[23]]?'':' <button class="btn-danger" onclick="deleteUser('+u[_0x1a2b[27]]+')" style="padding:4px 12px;font-size:11px;">Delete</button>')+'</td></tr>';})[_0x1a2b[15]]('');}catch(err){showToast('Error loading users.','error');console[_0x1a2b[12]](err);}}
+async function loadStats(){try{var res=await fetch(API_URL+'/api/admin/stats',{headers:getHeaders()});if(!res.ok){if(res.status===401||res.status===403){logoutAdmin();return;}
+throw new Error('Failed to load stats');}
+var data=await res[_0x1a2b[10]]();document[_0x1a2b[0]]('totalUsers')[_0x1a2b[17]]=data.totalUsers||0;document[_0x1a2b[0]]('vipUsers')[_0x1a2b[17]]=data.vipUsers||0;document[_0x1a2b[0]]('freeUsers')[_0x1a2b[17]]=data.freeUsers||0;document[_0x1a2b[0]]('totalLinks')[_0x1a2b[17]]=data.totalLinks||0;}catch(err){console[_0x1a2b[12]](err);}}
+async function setTier(userId,tier){if(!confirm('Set tier to '+tier[_0x1a2b[29]]()+' for this user?'))return;try{var res=await fetch(API_URL+'/api/admin/tier/'+userId,{method:'PUT',headers:getHeaders(),body:JSON[_0x1a2b[7]]({tier:tier})});if(!res.ok){var data=await res[_0x1a2b[10]]();showToast(data[_0x1a2b[3]]||'Failed to update tier','error');return;}
+showToast('User tier updated to '+tier[_0x1a2b[29]]()+'!','success');loadUsers();loadStats();}catch(err){showToast('Error updating tier.','error');console[_0x1a2b[12]](err);}}
+async function deleteUser(userId){if(!confirm('Delete this user? This cannot be undone.'))return;try{var res=await fetch(API_URL+'/api/admin/users/'+userId,{method:'DELETE',headers:getHeaders()});if(!res.ok){var data=await res[_0x1a2b[10]]();showToast(data[_0x1a2b[3]]||'Failed to delete user','error');return;}
+showToast('User deleted successfully.','info');loadUsers();loadStats();}catch(err){showToast('Error deleting user.','error');console[_0x1a2b[12]](err);}}
+function refreshData(){loadUsers();loadStats();showToast('Data refreshed.','success');}
+document[_0x1a2b[0]]('adminPassword').addEventListener('keydown',function(e){if(e.key==='Enter')verifyAdmin();});
+document[_0x1a2b[0]]('adminEmail').addEventListener('keydown',function(e){if(e.key==='Enter')verifyAdmin();});
+document.addEventListener('DOMContentLoaded',function(){var token=getToken();var userData=localStorage[_0x1a2b[4]]('voidlure_user');if(token&&userData){try{var user=JSON[_0x1a2b[6]](userData);if(user&&user.isAdmin){document[_0x1a2b[0]]('adminLogin').style.display='none';document[_0x1a2b[1]]('adminPanel').style.display='block';loadUsers();loadStats();return;}}catch(e){}}
+document[_0x1a2b[0]]('adminLogin').style.display='flex';document[_0x1a2b[1]]('adminPanel').style.display='none';});
+window.verifyAdmin=verifyAdmin;window.logoutAdmin=logoutAdmin;window.setTier=setTier;window.deleteUser=deleteUser;window.refreshData=refreshData;
+</script>
+</body>
+</html>
